@@ -15,19 +15,7 @@
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-success">Field Uses Weekly</h6>
-                    <div class="dropdown no-arrow">
-                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                            <div class="dropdown-header">Dropdown Header:</div>
-                            <a class="dropdown-item" href="#">Action</a>
-                            <a class="dropdown-item" href="#">Another action</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Something else here</a>
-                        </div>
-                    </div>
+                    <h6 class="m-0 font-weight-bold text-success">Earnings Weekly</h6>
                 </div>
                 <!-- Card Body -->
                 <div class="card-body">
@@ -44,46 +32,34 @@
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-success">Field Status</h6>
-                    <div class="dropdown no-arrow">
-                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                            <div class="dropdown-header">Dropdown Header:</div>
-                            <a class="dropdown-item" href="#">Action</a>
-                            <a class="dropdown-item" href="#">Another action</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Something else here</a>
-                        </div>
-                    </div>
                 </div>
                 <!-- Card Body -->
                 <div class="card-body">
                     <div class="chart-pie pt-4 pb-2">
                         <div class="row">
-                            <div class="col-xl-4 col-lg-5">
-                                <img src="img/field-red.png" class="field-img" />
-                                <div class="mt-4 text-center small">1st Field</div>
+                            @forelse ($field as $item)
+                            <div class="col-xl-2">
+                                <img id="img-{{$id_img++}}" src="img/field-green.png" class="field-img" />
+                                <div class="mt-2 text-center small">{{$item->nama_field}}</div>
+                                <input type="hidden" id="f-{{$no++}}" value="{{$item->id_field}}" />
                             </div>
-                            <div class="col-xl-4 col-lg-5 field">
-                                <img src="img/field-green.png" class="field-img" />
-                                <div class="mt-4 text-center small">2nd Field</div>
-                            </div>
-                            <div class="col-xl-4 col-lg-5">
-                                <img src="img/field-green.png" class="field-img" />
-                                <div class="mt-4 text-center small">3rd Field</div>
-                            </div>
+                            @empty
+                            No Field data
+                            @endforelse
+                            <input type="hidden" id="jml" value="{{$jml_field}}"/>
                         </div>
                         <!--canvas id="#"></canvas-->
                     </div>
                     <div class="mt-4 text-center small">
+
                         <span class="mr-2">
                             <i class="fas fa-circle text-success"></i> Available
                         </span>
                         <span class="mr-2">
                             <i class="fas fa-circle text-danger"></i> Used
                         </span>
-                    </div>
+
+                </div>
                 </div>
             </div>
         </div>

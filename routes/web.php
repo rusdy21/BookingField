@@ -17,9 +17,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
+/*Route::get('/', function () {
     return view('pages.dashboard');
-})->middleware('auth')->name('dashboard');
+})->middleware('auth')->name('dashboard');*/
 
 Route::get('/member', function () {
     return view('pages.member');
@@ -37,12 +37,14 @@ Route::get('/users', function () {
     return view('pages.booking');
 })->name('users');
 
-
+Route::get('getgraph',[CustomAuthController::class, 'getGraph'] )->middleware('auth')->name('dashboard.getgraph');
+Route::get('/',[CustomAuthController::class, 'dashboard'] )->middleware('auth')->name('dashboard');
 Route::get('login',[CustomAuthController::class, 'to_login'] )->name('login');
 Route::post('custom-login', [CustomAuthController::class, 'customLogin'])->name('login.custom');
 Route::get('signout', [CustomAuthController::class, 'signOut'])->name('signout');
 Route::post('time_start', [BookingController::class, 'time_start'])->name('booking.timestart');
 Route::post('time_finish', [BookingController::class, 'time_finish'])->name('booking.timefinish');
+Route::post('field_status', [BookingController::class, 'field_status'])->name('booking.fieldstatus');
 Route::get('testquery', [BookingController::class, 'testquery'])->name('booking.testquery');
 //Route::get('new-member',[MemberController::class, 'add_member'] )->name('new-member');
 //Route::post('member-store',[MemberController::class,'store'])->name('store.member');

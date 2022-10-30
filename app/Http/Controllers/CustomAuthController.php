@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRequest;
+use App\Models\Field;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
-use DB;
+//use DB;
 
 
 class CustomAuthController extends Controller
@@ -16,7 +18,6 @@ class CustomAuthController extends Controller
     public function index()
     {
         $items = User::all();
-
         return view ('pages.users.index')->with([
             'items' => $items,
             'no'=>1
@@ -79,7 +80,14 @@ class CustomAuthController extends Controller
     public function dashboard()
     {
         if(Auth::check()){
-            return view('dashboard');
+            $field = Field::all();
+            $jml_field = Field::all()->count();
+            return view('pages.dashboard')->with(
+                ['field' => $field,
+                 'no'=>1,
+                 'jml_field'=>$jml_field,
+                 'id_img'=>1
+            ]);
         }
 
         return redirect("login")->withSuccess('You are not allowed to access');
@@ -134,6 +142,15 @@ class CustomAuthController extends Controller
         $data = User::select("id","name")
                 ->where("name","LIKE","%{$request->term}%")->get();
         return response()->json($data);
+    }
+
+    public function getGraph(){
+        $data =DB::table('bookings')->select('booking_date',DB::raw('sum(price_field_per_hour * (time_end-time_start)/10000) as totalp') )->from('bookings')
+                        ->leftjoin('fields','bookings.id_field','=','fields.id_field')
+                        ->groupBy('booking_date')->get();
+
+        return response()->json($data);
+
     }
 
 

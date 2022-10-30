@@ -205,5 +205,47 @@ class BookingController extends Controller
         return redirect()->route('booking.index');
     }
 
+    public function testquery()
+    {
+        //echo "Test Query";
+        $waktu = (int)'09:00';
+        $waktu_baru = $waktu-1;
+      //  echo (string)$waktu_baru.":00";
 
+
+       $data['total'] = DB::table('bookings')->select('time_start')
+                ->where('id_field','=',1)
+                ->where('booking_date','=','2022-10-26')
+                ->where('time_start','=',(string)$waktu_baru.':00')
+                ->where(DB::raw('time_end-time_start'),'>', 10000)->count();
+
+
+        return response()->json($data);
+    }
+
+    public function field_status(Request $request){
+        $date_booking = $request->input('BookingDate');
+        $time_start = $request->input('time_start');
+        $field= $request->input('Field');
+
+        $hitung = DB::table('bookings')->select('time_start')
+                ->where('id_field','=',$field)
+                ->where('booking_date','=',$date_booking)
+                ->where('time_start','=',$time_start)->count();
+
+                if ($hitung > 0)
+                {
+                    $data['total']=1;
+                }
+                else{
+                    $hour_ago = (int)$time_start - 1;
+                    $data['total'] = DB::table('bookings')->select('time_start')
+                    ->where('id_field','=',$field)
+                    ->where('booking_date','=',$date_booking)
+                    ->where('time_start','=',(string)$hour_ago.":00")
+                    ->where(DB::raw('time_end-time_start'),'>', 10000)->count();
+                }
+
+                return response()->json($data);
+    }
 }
