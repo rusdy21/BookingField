@@ -8,6 +8,18 @@ use App\Models\Member;
 
 class MemberController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('permission:member index', ['only' => ['index']]);
+        $this->middleware('permission:member create', ['only' => ['create', 'store']]);
+        $this->middleware('permission:member edit', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:delete member', ['only' => ['destroy']]);
+
+    }
+
+
+
     public function index()
     {
         $items = Member::all();

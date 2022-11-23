@@ -1,6 +1,6 @@
 setInterval(function() {
     if (new Date().getMinutes() === 0) {
-        alert("new minute !");
+        //alert("new minute !");
     }
 }, 600000)
 
