@@ -52,7 +52,7 @@
                                     <td>{{strip_tags($item->alamat_member)}}</td>
                                     <td>
                                         <a href="{{route('member.edit', $item->id_member)}}" class="btn btn-info btn-sm">
-                                            <i class="fa fa-pencil-fill">
+                                            <i class="fa fa-edit">
 
                                             </i>
                                         </a>

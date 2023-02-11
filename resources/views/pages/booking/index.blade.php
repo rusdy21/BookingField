@@ -50,7 +50,7 @@
 
                                 @forelse ($items as $item)
                                 <tr>
-                                    <td>{{$no++}}</td>
+                                    <td>{{($items->currentPage() - 1) * $items->perPage() + $loop->iteration}}</td>
                                     <td>{{$item->nama_member}}</td>
                                     <td>{{$item->nama_field}}</td>
                                     <td>{{$item->booking_date}}</td>
@@ -58,7 +58,7 @@
                                     <td>{{$item->time_end}}</td>
                                     <td>
                                         <a href="{{route('booking.edit', $item->id_booking)}}" class="btn btn-info btn-sm">
-                                            <i class="fa fa-pencil-fill">
+                                            <i class="fa fa-edit">
 
                                             </i>
                                         </a>
@@ -85,10 +85,17 @@
 
 
                             </tbody>
+
                         </table>
+
                     </div>
+                    <span class="float-right">
+                        {{ $items->links() }}<br>
+                    </span>
+
                 </div>
             </div>
+
         </div>
     </div>
 

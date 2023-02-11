@@ -46,10 +46,10 @@
                                 <tr>
                                     <td>{{$no++}}</td>
                                     <td>{{$item->nama_field}}</td>
-                                    <td>{{$item->price_field_per_hour}}</td>
+                                    <td>Rp.{{number_format($item->price_field_per_hour, 2, ",",".")}}</td>
                                     <td>
                                         <a href="{{route('fields.edit', $item->id_field)}}" class="btn btn-info btn-sm">
-                                            <i class="fa fa-pencil-fill">
+                                            <i class="fa fa-edit">
 
                                             </i>
                                         </a>

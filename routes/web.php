@@ -17,17 +17,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-/*Route::get('/', function () {
-    return view('pages.dashboard');
-})->middleware('auth')->name('dashboard');*/
+
 
 Route::get('/member', function () {
     return view('pages.member');
 })->name('member');
 
-/*Route::get('/booking', function () {
-    return view('pages.booking');
-})->name('booking');*///
+
 
 Route::get('/fields', function () {
     return view('pages.booking');
@@ -38,6 +34,7 @@ Route::get('/users', function () {
 })->name('users');
 
 Route::get('getgraph',[CustomAuthController::class, 'getGraph'] )->middleware('auth')->name('dashboard.getgraph');
+Route::get('nextbooking',[CustomAuthController::class, 'nextBooking'] )->middleware('auth')->name('dashboard.nextbooking');
 Route::get('/',[CustomAuthController::class, 'dashboard'] )->middleware('auth')->name('dashboard');
 Route::get('login',[CustomAuthController::class, 'to_login'] )->name('login');
 Route::post('custom-login', [CustomAuthController::class, 'customLogin'])->name('login.custom');

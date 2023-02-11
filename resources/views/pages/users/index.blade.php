@@ -49,7 +49,7 @@
                                     <td>{{$item->email}}</td>
                                     <td>
                                         <a href="{{route('users.edit', $item->id)}}" class="btn btn-info btn-sm">
-                                            <i class="fa fa-pencil-fill">
+                                            <i class="fa fa-edit">
 
                                             </i>
                                         </a>

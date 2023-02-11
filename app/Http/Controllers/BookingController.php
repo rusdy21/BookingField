@@ -2,15 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use DateTime;
 use App\Models\Field;
 use App\Models\Member;
 use App\Models\Booking;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class BookingController extends Controller
 {
     //
+    public function __construct()
+    {
+        $this->middleware('permission:booking index', ['only' => ['index']]);
+        $this->middleware('permission:booking create', ['only' => ['create', 'store']]);
+        $this->middleware('permission:booking edit', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:booking user', ['only' => ['destroy']]);
+    }
+
     public function create()
     {
         $field = Field::all();
@@ -46,7 +55,9 @@ class BookingController extends Controller
                           ->join('fields','bookings.id_field','=','fields.id_field')
                         ->orderBy('id_booking','desc')
                         ->orderBy('time_start','desc')
-                          ->get((['bookings.*', 'members.nama_member','fields.nama_field']));
+                        ->paginate(10, ['bookings.*', 'members.nama_member','fields.nama_field']);
+                          //->get((['bookings.*', 'members.nama_member','fields.nama_field']));
+
 
         return view ('pages.booking.index')->with([
             'items' => $items,
@@ -56,33 +67,63 @@ class BookingController extends Controller
 
     public function edit($id)
     {
+        $date_now = date("Y-m-d");
+        $time_now = date('H:i:s');
         $item = Booking::where('id_booking',$id)->first();
         $field = Field::all();
         $member = Member::all();
         $date_booking = $item->booking_date;
         $field_item = $item->id_field;
-       $time_start = DB::table('timeslots')->select('slot')
-        ->whereNotIn('slot',function($query) use ($date_booking,$field_item,$id) {
-           $query->select('time_start')->from('bookings')
-           ->where('booking_date','=',$date_booking)
-           ->where('id_field','=', $field_item)
-           ->where('id_booking','!=',$id);
-
-         })
-         ->whereNotIn('slot',function($query2) use($date_booking,$field_item, $id){
-           $query2->select('slot')->from('timeslots')
-           ->join('bookings', function($join) use ($date_booking, $field_item,$id){
-               $join->on('timeslots.slot','>','bookings.time_start')
-                       ->on('timeslots.slot','<','bookings.time_end')
+        if ($date_booking == $date_now){
+            $time_start = DB::table('timeslots')->select('slot')->where('slot','>',$time_now)
+            ->whereNotIn('slot',function($query) use ($date_booking,$field_item,$id) {
+               $query->select('time_start')->from('bookings')
                ->where('booking_date','=',$date_booking)
                ->where('id_field','=', $field_item)
-               ->where(DB::raw('time_end-time_start'),'>', 10000)
-               ->where('id_booking','!=', $id);
-           });
+               ->where('id_booking','!=',$id);
+
+             })
+             ->whereNotIn('slot',function($query2) use($date_booking,$field_item, $id){
+               $query2->select('slot')->from('timeslots')
+               ->join('bookings', function($join) use ($date_booking, $field_item,$id){
+                   $join->on('timeslots.slot','>','bookings.time_start')
+                           ->on('timeslots.slot','<','bookings.time_end')
+                   ->where('booking_date','=',$date_booking)
+                   ->where('id_field','=', $field_item)
+                   ->where(DB::raw('time_end-time_start'),'>', 10000)
+                   ->where('id_booking','!=', $id);
+               });
 
 
-         })
-         ->get();
+             })
+             ->get();
+        }
+        else{
+            $time_start = DB::table('timeslots')->select('slot')
+            ->whereNotIn('slot',function($query) use ($date_booking,$field_item,$id) {
+               $query->select('time_start')->from('bookings')
+               ->where('booking_date','=',$date_booking)
+               ->where('id_field','=', $field_item)
+               ->where('id_booking','!=',$id);
+
+             })
+             ->whereNotIn('slot',function($query2) use($date_booking,$field_item, $id){
+               $query2->select('slot')->from('timeslots')
+               ->join('bookings', function($join) use ($date_booking, $field_item,$id){
+                   $join->on('timeslots.slot','>','bookings.time_start')
+                           ->on('timeslots.slot','<','bookings.time_end')
+                   ->where('booking_date','=',$date_booking)
+                   ->where('id_field','=', $field_item)
+                   ->where(DB::raw('time_end-time_start'),'>', 10000)
+                   ->where('id_booking','!=', $id);
+               });
+
+
+             })
+             ->get();
+        }
+
+
             $time_finish="";
             $count = DB::table('bookings')->select('time_start')
                     ->where('time_start','>',$item->time_start)
@@ -120,7 +161,10 @@ class BookingController extends Controller
 
        $date_booking = $request->input('BookingDate');
         $field = $request->input('Field');
-        $data['time_start'] = DB::table('timeslots')->select('slot')
+        $date_now = date("Y-m-d");
+        $time_now = date('H:i:s');
+        if ($date_now == $date_booking){
+            $data['time_start'] = DB::table('timeslots')->select('slot')->where('slot','>',$time_now)
         ->whereNotIn('slot',function($query) use ($date_booking,$field) {
            $query->select('time_start')->from('bookings')
            ->where('booking_date','=',$date_booking)
@@ -140,6 +184,30 @@ class BookingController extends Controller
 
          })
          ->get();
+
+        }else{
+            $data['time_start'] = DB::table('timeslots')->select('slot')
+        ->whereNotIn('slot',function($query) use ($date_booking,$field) {
+           $query->select('time_start')->from('bookings')
+           ->where('booking_date','=',$date_booking)
+           ->where('id_field','=', $field);
+
+         })
+         ->whereNotIn('slot',function($query2) use($date_booking,$field){
+           $query2->select('slot')->from('timeslots')
+           ->join('bookings', function($join) use ($date_booking, $field){
+               $join->on('timeslots.slot','>','bookings.time_start')
+                       ->on('timeslots.slot','<','bookings.time_end')
+               ->where('booking_date','=',$date_booking)
+               ->where('id_field','=', $field)
+               ->where(DB::raw('time_end-time_start'),'>', 10000);
+           });
+
+
+         })
+         ->get();
+
+        }
 
 
             return response()->json($data);
@@ -205,22 +273,8 @@ class BookingController extends Controller
         return redirect()->route('booking.index');
     }
 
-    public function testquery()
-    {
-        //echo "Test Query";
-        $waktu = (int)'09:00';
-        $waktu_baru = $waktu-1;
-      //  echo (string)$waktu_baru.":00";
-
-
-       $data['total'] = DB::table('bookings')->select('time_start')
-                ->where('id_field','=',1)
-                ->where('booking_date','=','2022-10-26')
-                ->where('time_start','=',(string)$waktu_baru.':00')
-                ->where(DB::raw('time_end-time_start'),'>', 10000)->count();
-
-
-        return response()->json($data);
+    public function testquery(){
+        echo date('H:i:s');
     }
 
     public function field_status(Request $request){

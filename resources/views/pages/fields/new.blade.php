@@ -63,4 +63,20 @@
 </div>
 @endsection
 
+@section('new_script')
+<script>
+    $(document).ready(function () {
+        $("#price_field_per_hour").on('blur', function() {
+        const value = this.value.replace(/,/g, '');
+        this.value = parseFloat(value).toLocaleString('en-US', {
+        style: 'currency',
+        currency: 'IDR',
+        maximumFractionDigits: 0
+
+     });
+        });
+
+});
+</script>
+@endsection
 

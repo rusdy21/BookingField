@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\UserRequest;
-use App\Models\Field;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use App\Models\User;
+use App\Models\Field;
+use App\Models\Booking;
+use Illuminate\Http\Request;
+use App\Http\Requests\UserRequest;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 //use DB;
@@ -15,6 +16,15 @@ use Illuminate\Support\Facades\Session;
 
 class CustomAuthController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('permission:user index', ['only' => ['index']]);
+        $this->middleware('permission:user create', ['only' => ['create', 'store']]);
+        $this->middleware('permission:user edit', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:delete user', ['only' => ['destroy']]);
+    }
+
     public function index()
     {
         $items = User::all();
@@ -145,13 +155,32 @@ class CustomAuthController extends Controller
     }
 
     public function getGraph(){
+        $firstDay = date('Y-m-d', strtotime("this week"));
+        $endDay = date('Y-m-d', strtotime($firstDay. '+ 6 days'));
         $data =DB::table('bookings')->select('booking_date',DB::raw('sum(price_field_per_hour * (time_end-time_start)/10000) as totalp') )->from('bookings')
                         ->leftjoin('fields','bookings.id_field','=','fields.id_field')
+                        ->where('bookings.booking_date','>=',$firstDay)
+                        ->where('bookings.booking_date','<=',$endDay)
                         ->groupBy('booking_date')->get();
 
         return response()->json($data);
 
     }
+
+    public function nextBooking(){
+        $currentDay = date('Y-m-d');
+        $currentTime = date('H:i:s');
+        $nextBook = Booking::join('members','bookings.id_member','=','members.id_member')
+        ->join('fields','bookings.id_field','=','fields.id_field')
+        ->where('bookings.booking_date',$currentDay)
+        ->where('time_start','>',$currentTime)
+        ->orderBy('id_booking','desc')
+        ->orderBy('time_start','desc')
+        ->get((['bookings.*', 'members.nama_member','fields.nama_field']));
+
+        return response()->json($nextBook);
+    }
+
 
 
 }
