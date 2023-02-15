@@ -16,7 +16,7 @@
         "postcss": "^8.1.14"
     },
     "dependencies": {
-        "@eonasdan/tempus-dominus": "^6.0.0",
+        "@eonasdan/tempus-dominus": "^6.2.10",
         "bootstrap-icons": "^1.9.1"
     }
 }
